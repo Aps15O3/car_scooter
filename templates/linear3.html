@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+{% block title %}Car{% endblock title %}
+
+{% block body %}
+<style>
+    .dropdown-toggle{
+        width: 200px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 50px;
+        border: 2px solid #fff;
+        font-weight: 600;
+        color:#fff;
+        
+    
+    }
+    .dropdown-toggle:focus{
+    
+        box-shadow: none !important;
+    
+    }
+    
+    
+    .dropdown-toggle::after {
+    
+        display: none;
+    
+    }
+    
+    .dropdown-toggle:hover
+    {
+        color: #ffffff;
+        background-color: #1d3b54;        
+    }
+    .dropdown-toggle:hover .dropdown-item{
+        display: block;
+    }
+    
+    .dropdown-item:focus, .dropdown-item:hover {
+        color: #ffffff;
+        background-color: #1d3b54;
+        padding: 12px;
+    }
+    
+    .dropdown-item {
+        display: block;
+        width: 100%;
+        padding: 12px;   
+        color:#fff; 
+        overflow: auto;
+        }  
+    .dropdown-item::-webkit-scrollbar {
+    
+        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+        background-color:#1d3b54;
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+      }
+</style>
+
+<div class="container mask">
+    <div class="jumbotron rounded-3 p-3 text-center text-light  border " id="company_list"style="width:20%;margin-left:-100px;position:absolute;height:600px;overflow: auto;">
+        <h4>Company list</h4>
+        {%for company in comp%}
+        <ul style="list-style: none;">
+            <li>{{company}}</li>
+        </ul>
+        {%endfor%}
+    </div>
+   <center>
+    <div class="jumbotron rounded-3 p-3 text-center text-light  border " id="model_list"style="width:20%;margin-left:-100px;position:absolute;height:600px;overflow: auto;">
+        <h4>Model List</h4>
+        
+    </div>
+   <center>
+   <br>
+<div class="jumbotron-fluid  rounded-3 p-3 text-center text-light  border" style="width:40%;background-color: rgba(0, 0, 0, 0.3)"  >
+
+<form method="POST" action="/linear3">
+    <center>
+   
+    {% csrf_token %}
+    <label class="form-label">Select company</label>
+    <select class="form-select inner-border dropdown-toggle dropdown-item" id="comp_id" onChange="load123(this.id)" style="width:50%;"  data-live-search="true">
+      <option value="0"></option>
+       
+        {%for company in comp%}
+        <option value="{{company}}" data-tokens="{{company}}" class="dropdown-item">{{company}}</option>
+        {%endfor%}
+    
+    </select> 
+    <br>
+    <label class="form-label">Select Model</label>
+    <select class="form-select dropdown-toggle dropdown-item" id="name_id" style="width:50%;"  required>
+        <option value="0"></option>
+    </select>
+    
+    <br>
+    <label class="form-label">Year</label>
+    <select class="form-select dropdown-toggle dropdown-item" id="year_id" style="width:50%;"  required>
+        <option value="0"></option>
+        {%for year in yop%}
+        <option value="{{year}}">{{year}}</option>
+        {%endfor%}
+        <option value="2020">2020</option>
+        <option value="2021">2021</option>
+        <option value="2022">2022</option>
+
+    </select>
+    <br>
+    <label class="form-label">Fuel Type</label>
+    <select class="form-select dropdown-toggle dropdown-item" id="fuel_id" style="width:50%;"  required>
+     
+        <option value="0"></option>
+        <option value="LPG">CNG</option>
+        <option value="Petrol">Petrol</option>
+        <option value="Diesel">Diesel</option>
+    
+    </select>
+    <br>
+    <label class="form-label">Kms Driven</label>
+    <input type="number" style="width:50%; background-color: rgba(255, 255, 255, 0);color:#fff;border: 2px solid #fff;"  class="form-control" id="km"></input>
+    <br>
+    <input type="button" class="btn btn-outline-light" onClick="pred()" value="Predict"></input>
+    <br><br>
+
+</form>
+</div>
+<br>
+</div>
+<br>
+
+</div>
+
+
+<div id='p' class="jumbotron-fluid  rounded-3 p-3 text-center border" style="background-color:#264b6e;
+color:#fff;width:40%;height:370px;position:absolute;margin-left:30%;margin-top:-40%;font-size:50px;overflow:auto" class="display-1">
+<br><br>
+</div>
+</center>
+<script>
+    var flag1=0;
+$("#p").hide()
+$("#company_list").hide()
+$("#model_list").hide()
+
+function load123(comp_id)
+{
+    console.log(comp_id)
+    var company = document.getElementById(comp_id);
+    var model = document.getElementById("name_id");
+    var model_list = document.getElementById("model_list");
+    model.innerHTML="";
+    model.value="";
+    model_list.innerHTML="<h4>Model List</h4>";
+    console.log(company.value)
+    {%for compan in comp%}
+    console.log("{{compan}}"+" "+company.value)
+    if("{{compan}}"==company.value)
+    {
+      console.log(model)
+        {% for model in models  %}
+        {% if compan in model %}
+        var option = document.createElement("option");
+        var option1 = document.createElement("option");
+        option.append("{{model}}");
+        option1.append("{{model}}");
+        option.value=("{{model}}");
+        model.appendChild(option);
+        model_list.appendChild(option1);
+
+        {% endif %}
+        {% endfor %}
+    }
+    {% endfor %}
+    
+   }
+function pred(){
+    var model = document.getElementById("name_id");
+    var year = document.getElementById("year_id");
+    var fuel = document.getElementById("fuel_id");
+    var company = document.getElementById("comp_id");
+    var kms = document.getElementById("km");
+    if(model.value=="")
+    {
+        alert("Please fill a value!!!")
+    }
+    else if(year.value=="")
+    {
+        alert("Please fill a value!!!")
+    }
+    else if(kms.value=="")
+    {
+        alert("Please fill a value!!!")
+    }
+    else if(fuel.value=="")
+    {
+        alert("Please fill a value!!!")
+    }
+    else if(company.value=="")
+    {
+        alert("Please fill a value!!!")
+    }
+    else {
+    model=model.value;
+    year=year.value;
+    fuel=fuel.value;
+    company=company.value;
+    kms=kms.value;
+    $.ajax({
+        type : "post",
+        url : "/car",
+        data: {csrfmiddlewaretoken: '{{ csrf_token }}',
+               model,
+               year,
+               fuel,
+               company,
+               kms
+                },
+        success: function(resp)
+        {
+            $(".container").css({"opacity":"0.4"});
+            $("nav").css({"opacity":"0.4"});
+            $("#p").css({"opacity":"1"});
+            $("#p").show();
+           
+            console.log(resp)
+            var k = resp
+            document.getElementById('p').innerHTML="<br>The cost of the car should be Rs:- "+resp
+            
+           flag1=1
+        }
+      })
+    }
+   
+   
+}
+$("body").click(function(){
+    if(flag1==1)
+    {
+        $(".container").css({"opacity":"1"});
+        $("nav").css({"opacity":"1"});
+        $("#p").hide()
+    }
+})
+</script>
+
+{% endblock body %}
